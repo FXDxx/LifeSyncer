@@ -19,7 +19,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('doctors/', include('doctor_panel_api.urls')),
     path('register/', include('django.contrib.auth.urls')),
     path('register/', include('user_registration.urls')),
+    path('drhome/', include('doctor_panel_api.urls')),
 ]
