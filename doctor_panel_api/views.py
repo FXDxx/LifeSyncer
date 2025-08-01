@@ -3,34 +3,27 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.http import FileResponse, Http404
 from rest_framework import status, generics
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .serializers import *
 from rest_framework.exceptions import APIException
+from rest_framework.permissions import IsAuthenticated
+
 # Create your views here.
 
 @api_view(['POST'])
-def login_doctor(request):
-    #print(request.data)
+@permission_classes([IsAuthenticated])
+def signup_doctor(request):
     username = request.data.get("username")
     password = request.data.get("password")
-    user = authenticate(username=username, password=password)
-    print("Authentication: ",user)
-    if user is not None:
-        return Response({
-            "message":"Login successfully",
-            "user":{
-                "id":user.id,
-                "username":username
-            },
-            "Home Page":{
-                "Dashboard":"To Dashboard"
-            },
-        }, status=status.HTTP_200_OK)
-    else:
-        return Response({
-            "message":"Page not found",
-        }, status=status.HTTP_401_UNAUTHORIZED)
+
+    DoctorLogin.objects.create(
+        username=username,
+        password=password,
+    )
+    return Response({
+            "message":"Login successfully"}, status=status.HTTP_200_OK)
+  
     
 
 @api_view(['GET'])
@@ -143,7 +136,27 @@ def view_lab_report(request, cnic):
 
 @api_view(['GET'])
 def display_dashboard(request):
-    pass
+    patient_data = PatientInfo.objects.all()
+    patient_contact_data = PatientInfo.objects.all()
+    patient_last_visit_date = PatientAppointments.objects.all()
+
+    if not patient_data.exists() and not patient_contact_data.exists() and not patient_last_visit_date.exists():
+        return Response({"error:", "data not found"}, status=status.HTTP_204_NO_CONTENT)
+    
+    patient_info_serializer = PatientInfoSerializer(patient_data, many=True)
+    contact_serializer = PatientContactSerializer(patient_contact_data, many=True)
+    patient_last_visit_serializer = PatientAppointmentsSerializer(patient_last_visit_date)
+    
+
+    
+    
+    return Response({
+        "Patient data: ": patient_info_serializer.data,
+        "Contact: ": contact_serializer.data,
+        "Last visit: ": patient_last_visit_serializer.data
+        }, status=status.HTTP_200_OK)
+
+
     
 
 

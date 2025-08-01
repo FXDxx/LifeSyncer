@@ -18,10 +18,10 @@ class PatientInfo(models.Model):
     patient_status=models.CharField(max_length=20, null=True)
     patient_diagnosis=models.TextField(max_length=200,null=True)
     def __str__(self):
-        return self.cnic, self.patient_name, self.patient_age, self.patient_gender, self.patient_status, self.patient_diagnosis
+        return str(self.cnic), self.patient_name, self.patient_age, self.patient_gender, self.patient_status, self.patient_diagnosis
     
 class PatientMedication(models.Model):
-    patient_id=models.ForeignKey(PatientInfo, to_field='cnic', on_delete=models.CASCADE)
+    patient=models.ForeignKey(PatientInfo, to_field='cnic', on_delete=models.CASCADE)
     medication_name = models.CharField(max_length=100, null=True)
     medication_dosage=models.IntegerField(null=False)
     medication_frequency= models.IntegerField(null=True)
@@ -33,7 +33,7 @@ class PatientMedication(models.Model):
         return self.medication_name
 
 class PatientAppointments(models.Model):
-    patient_id=models.ForeignKey(PatientInfo,to_field='cnic', on_delete=models.CASCADE)
+    patient=models.ForeignKey(PatientInfo,to_field='cnic', on_delete=models.CASCADE)
     recent_visit_date=models.DateField()
     next_visit_date=models.DateField()
 
@@ -41,7 +41,7 @@ class PatientAppointments(models.Model):
         return self.recent_visit_date
 
 class PatientVitals(models.Model):
-    patient_id=models.ForeignKey(PatientInfo,to_field='cnic', on_delete=models.CASCADE)
+    patient=models.ForeignKey(PatientInfo,to_field='cnic', on_delete=models.CASCADE)
     patient_tempreture=models.IntegerField(null=True)
     patient_blood_pressure=models.IntegerField(null=True)
     patient_glucose_level=models.IntegerField(null=True)
@@ -50,13 +50,13 @@ class PatientVitals(models.Model):
     patient_oxygen= models.CharField(max_length=30)
 
     def __str__(self):
-        return self.patient_id
+        return str(self.patient)
 
 class PatientLabReports(models.Model):
-    patient_id=models.ForeignKey(PatientInfo,to_field='cnic', on_delete=models.CASCADE)
+    patient=models.ForeignKey(PatientInfo,to_field='cnic', on_delete=models.CASCADE)
     patient_report = models.FileField(upload_to='documents')
     def __str__(self):
-        return self.patient_id
+        return str(self.patient)
     
 class PatientContactInfo(models.Model):
     patient=models.ForeignKey(PatientInfo,to_field='cnic', on_delete=models.CASCADE)
